@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkUp - Contact Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        .nav {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .contact-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .contact-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        .contact-info {
+            margin-bottom: 16px;
+        }
+        .contact-info div {
+            margin-bottom: 8px;
+            color: #666;
+        }
+        .contact-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-edit {
+            background: #4CAF50;
+            color: white;
+            flex: 1;
+        }
+        .btn-delete {
+            background: #f44336;
+            color: white;
+            padding: 12px 16px;
+        }
+        .hidden {
+            display: none;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid white;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 LinkUp</h1>
+            <p>Connect & manage all your contacts in one place</p>
+        </div>
+
+        <div class="nav">
+            <button class="btn btn-primary" onclick="showPage('home')">🏠 Home</button>
+            <button class="btn btn-primary" onclick="showPage('add')">➕ Add Contact</button>
+            <button class="btn btn-primary" onclick="showPage('view')">📋 View All</button>
+        </div>
+
+        <div id="homePage">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalContacts">0</div>
+                    <div class="stat-label">Total Contacts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">💾</div>
+                    <div class="stat-label">Saved Permanently</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">No Limit</div>
+                </div>
+            </div>
+            <div class="empty-state">
+                <h3>Welcome to LinkUp!</h3>
+                <p>Start managing your contacts by clicking "Add Contact" above.</p>
+            </div>
+        </div>
+
+        <div id="addPage" class="hidden">
+            <div class="card" style="max-width: 600px; margin: 0 auto;">
+                <h2 id="formTitle">➕ Add New Contact</h2>
+                <form id="contactForm" onsubmit="saveContact(event)">
+                    <div class="form-group">
+                        <label>👤 Name *</label>
+                        <input type="text" id="name" required placeholder="Enter full name">
+                    </div>
+                    <div class="form-group">
+                        <label>📞 Phone Number *</label>
+                        <input type="tel" id="phone" required placeholder="Enter phone number">
+                    </div>
+                    <div class="form-group">
+                        <label>📧 Email (Optional)</label>
+                        <input type="email" id="email" placeholder="Enter email address">
+                    </div>
+                    <div class="form-group">
+                        <label>📍 Address (Optional)</label>
+                        <textarea id="address" rows="3" placeholder="Enter address"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1; background: #4CAF50; color: white;">💾 Save</button>
+                        <button type="button" class="btn" style="background: #999; color: white;" onclick="cancelEdit()">❌ Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="viewPage" class="hidden">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search contacts..." oninput="searchContacts()">
+            </div>
+            <h2 style="color: white; margin-bottom: 20px;">📋 All Contacts (<span id="contactCount">0</span>)</h2>
+            <div id="contactsList" class="contacts-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        let contacts = JSON.parse(localStorage.getItem('linkup_contacts')) || [];
+        let editingId = null;
+
+        function showPage(page) {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('addPage').classList.add('hidden');
+            document.getElementById('viewPage').classList.add('hidden');
+            
+            if (page === 'home') {
+                document.getElementById('homePage').classList.remove('hidden');
+                updateStats();
+            } else if (page === 'add') {
+                document.getElementById('addPage').classList.remove('hidden');
+            } else if (page === 'view') {
+                document.getElementById('viewPage').classList.remove('hidden');
+                displayContacts();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalContacts').textContent = contacts.length;
+        }
+
+        function saveContact(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const address = document.getElementById('address').value.trim();
+            
+            if (editingId !== null) {
+                const index = contacts.findIndex(c => c.id === editingId);
+                contacts[index] = { id: editingId, name, phone, email, address };
+                editingId = null;
+            } else {
+                contacts.push({
+                    id: Date.now(),
+                    name, phone, email, address
+                });
+            }
+            
+            localStorage.setItem('linkup_contacts', JSON.stringify(contacts));
+            document.getElementById('contactForm').reset();
+            showPage('view');
+        }
+
+        function displayContacts(filteredContacts = null) {
+            const list = filteredContacts || contacts;
+            document.getElementById('contactCount').textContent = list.length;
+            
+            if (list.length === 0) {
+                document.getElementById('contactsList').innerHTML = '<div class="card" style="text-align: center; padding: 40px;"><h3>📭 No contacts found</h3><p>Add your first contact to get started!</p></div>';
+                return;
+            }
+            
+            document.getElementById('contactsList').innerHTML = list.map(c => `
+                <div class="contact-card">
+                    <div class="contact-header">
+                        <div class="avatar">👤</div>
+                        <h3>${c.name}</h3>
+                    </div>
+                    <div class="contact-info">
+                        <div>📞 ${c.phone}</div>
+                        ${c.email ? `<div>📧 ${c.email}</div>` : ''}
+                        ${c.address ? `<div>📍 ${c.address}</div>` : ''}
+                    </div>
+                    <div class="contact-actions">
+                        <button class="btn btn-edit" onclick="editContact(${c.id})">✏️ Edit</button>
+                        <button class="btn btn-delete" onclick="deleteContact(${c.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function searchContacts() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            if (!term) {
+                displayContacts();
+                return;
+            }
+            const filtered = contacts.filter(c => 
+                c.name.toLowerCase().includes(term) ||
+                c.phone.includes(term) ||
+                (c.email && c.email.toLowerCase().includes(term))
+            );
+            displayContacts(filtered);
+        }
+
+        function editContact(id) {
+            const contact = contacts.find(c => c.id === id);
+            editingId = id;
+            document.getElementById('name').value = contact.name;
+            document.getElementById('phone').value = contact.phone;
+            document.getElementById('email').value = contact.email || '';
+            document.getElementById('address').value = contact.address || '';
+            document.getElementById('formTitle').textContent = '✏️ Edit Contact';
+            showPage('add');
+        }
+
+        function cancelEdit() {
+            editingId = null;
+            document.getElementById('contactForm').reset();
+            document.getElementById('formTitle').textContent = '➕ Add New Contact';
+            showPage('view');
+        }
+
+        function deleteContact(id) {
+            if (confirm('Delete this contact?')) {
+                contacts = contacts.filter(c => c.id !== id);
+                localStorage.setItem('linkup_contacts', JSON.stringify(contacts));
+                displayContacts();
+                updateStats();
+            }
+        }
+
+        showPage('home');
+        updateStats();
+    </script>
+</body>
+</html>
